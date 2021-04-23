@@ -29,6 +29,8 @@ Move the `steggo` executable to somewhere in your path.
 
 This project is for educational purposes only. It is not supported in any way. Use at your own risk.
 
+Only built and tested on Linux.
+
 ## Concepts:
 
 Encoding data into a file is done by going through the red, green and blue channels of each pixel in an image and shifting the values as needed to be even or odd. An even value represents a 0 bit. An odd value represents a 1 bit. 
