@@ -38,27 +38,36 @@ func decode(image string) {
 }
 
 func parseData(data []byte) string {
-	message := ""
-	char := ""
+	message := make([]byte, 1000)
+	var char byte = 0
 
+	j := 0
 	for i := 0; i < len(data); i++ {
 		// skip alpha channels
 		if !isAlphaChannel(i) {
 			b := data[i]
-			// add "0" / "1" for even / odd
-			char += fmt.Sprintf("%d", b%2)
-			if len(char) == 9 {
-				// 8 bits + signal bit
-				str, end := parseChar(char)
-				message += str
-				char = ""
-				if end {
-					return message
+			// add 1 if the bit is odd
+			if b%2 == 1 {
+				char += 1
+			}
+			j++
+			if j < 8 {
+				// shift left
+				char = char << 1
+			} else {
+				// we have 8 bits now. add the char to the message
+				message = append(message, char)
+				j = 0
+				char = 0
+				i++
+				// check the signal bit. if odd, return.
+				if data[i]%2 == 1 {
+					return string(message)
 				}
 			}
 		}
 	}
-	return message
+	return string(message)
 }
 
 func parseChar(c string) (string, bool) {
