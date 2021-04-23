@@ -45,6 +45,8 @@ Decoding is just the reverse. The program reads each channel of each pixel, skip
 
 Since each channel of each pixel is only changed by a maximum of 1 unit (out of 256), it is effectively invisible in the output image. Of course, various types of image filters and manipulation may bring out the artifacts to a greater or lesser degree (and destroy the data in the process).
 
+Using this method, a 100x100 pixel can hold 3,750 characters. 100 * 100 * 3 channels / 8 bits = 3,750. A full 4k image could almost hold all the text in War and Peace (over 3 million characters). In fact, I've done just this and it worked. Encoding took seconds. Decoding took 20 minutes. Some room for optimization there.
+
 I'm using this for computer generated images, to store the parameters used to make the image. So I can pull the parameters back out later and recreate that image.
 
 I guess you could also use it to send secret messages around, but be sure to encrypt the message before you embed it in an image. The only thing keeping anyone from reading messages in an image created this way is that people might not think to look for them.
