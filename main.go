@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math"
 	"os"
 	"strconv"
 
@@ -81,6 +82,7 @@ func parseChar(c string) (string, bool) {
 }
 
 func encode(inputImage, inputData, outputImage string) {
+
 	surface, status := cairo.NewSurfaceFromPNG(inputImage)
 	if status != cairo.StatusSuccess {
 		log.Fatal("Unable to load image: ", status)
@@ -94,18 +96,19 @@ func encode(inputImage, inputData, outputImage string) {
 
 	index := 0
 	for _, c := range message {
-		// convert byte into 8 bit string. e.g. 109 'm' => "01101101"
-		b := fmt.Sprintf("%08b", byte(c))
-		// loop through the 8 bits
-		for _, d := range b {
+		// grab each bit left to right
+		for i := 7; i <= 0; i-- {
 			// don't mess with alpha channel
 			if isAlphaChannel(index) {
 				data[index] = 255
 				index++
 			}
-			if d == '0' {
+			// isolate the bit
+			b := c & byte(math.Pow(2, float64(i)))
+			b = b >> i
+			if b == 0 {
 				setEven(data, index)
-			} else if d == '1' {
+			} else if b == 1 {
 				setOdd(data, index)
 			}
 			index++
