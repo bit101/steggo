@@ -4,6 +4,11 @@ Encodes the context of a text file into a png image.
 
 Decodes that data back out of the image.
 
+## Dependencies:
+
+- go 1.16
+- go-cairo `go get github.com/bit101/go-cairo`
+
 ## Build: 
 
     `go build`
