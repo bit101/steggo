@@ -19,11 +19,17 @@ Move the `steggo` executable to somewhere in your path.
 
 ## Usage:
 
-    steggo encode input.png datafile.txt encoded.png
+    # encode a data file into an image
+    steggo encode -i input.png -o encoded.png -d datafile.txt 
 
-    steggo decode encoded.png
+    # encode text from the command line into the image
+    steggo encode -i input.png -o encoded.png -t "some text" 
 
-    steggo decode encoded.png > recovered.txt
+    # decode text from an image, dumping to the console
+    steggo decode -i encoded.png
+
+    # decode text from an image, dumping to a file
+    steggo decode -i encoded.png -o recovered.txt
 
 ## Notes:
 
