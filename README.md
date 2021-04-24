@@ -66,3 +66,4 @@ Encoded Image:
 
 Diff of the two images, massively enhanced to show the changes:
 ![diff](diff.png)
+Enhanced by cranking up the brightness and contrast as much as possible. Without that, you can see no trace of the data even in the diffed image.
