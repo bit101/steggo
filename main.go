@@ -82,7 +82,6 @@ func parseChar(c string) (string, bool) {
 }
 
 func encode(inputImage, inputData, outputImage string) {
-
 	surface, status := cairo.NewSurfaceFromPNG(inputImage)
 	if status != cairo.StatusSuccess {
 		log.Fatal("Unable to load image: ", status)
@@ -97,7 +96,7 @@ func encode(inputImage, inputData, outputImage string) {
 	index := 0
 	for _, c := range message {
 		// grab each bit left to right
-		for i := 7; i <= 0; i-- {
+		for i := 7; i >= 0; i-- {
 			// don't mess with alpha channel
 			if isAlphaChannel(index) {
 				data[index] = 255
