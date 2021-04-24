@@ -1,4 +1,4 @@
-module steggo
+module github.com/bit101/steggo
 
 go 1.16
 
