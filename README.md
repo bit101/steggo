@@ -1,5 +1,7 @@
 # steggo
 
+A Golang based steganography tool.
+
 Encodes the context of a text file into a png image.
 
 Decodes that data back out of the image.

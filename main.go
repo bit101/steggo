@@ -12,6 +12,8 @@ import (
 	"github.com/bit101/go-cairo"
 )
 
+const version = "v1.0"
+
 func main() {
 	encodeCmd := flag.NewFlagSet("enable", flag.ExitOnError)
 	inputImage := encodeCmd.String("i", "", "input image")
@@ -24,14 +26,25 @@ func main() {
 	outputFile := decodeCmd.String("o", "", "output text file")
 
 	help := flag.Bool("h", false, "help")
+	ver := flag.Bool("v", false, "help")
 	flag.Parse()
 
 	if *help {
 		fmt.Println("Usage:")
+		fmt.Println("Encode data into an image:")
 		fmt.Println("  steggo encode -i input.png -o encoded.png -d datafile ")
 		fmt.Println("  steggo encode -i input.png -o encoded.png -t \"some text\"")
+		fmt.Println("Decode data from an image:")
 		fmt.Println("  steggo decode -i encoded.png")
 		fmt.Println("  steggo decode -i encoded.png > output.txt")
+		fmt.Println("Help and version info:")
+		fmt.Println("  steggo -h")
+		fmt.Println("  steggo -v")
+		os.Exit(0)
+	}
+
+	if *ver {
+		fmt.Printf("steggo %s\n", version)
 		os.Exit(0)
 	}
 
@@ -49,7 +62,7 @@ func main() {
 		} else if *dataFile != "" {
 			encodeFile(*inputImage, *outputImage, *dataFile)
 		} else {
-			fmt.Println("encode requires '-d data file' or '-t text'")
+			fmt.Println("encode requires '-d datafile' or '-t text'")
 			os.Exit(1)
 		}
 
