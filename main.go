@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -12,34 +13,75 @@ import (
 )
 
 func main() {
+	encodeCmd := flag.NewFlagSet("enable", flag.ExitOnError)
+	inputImage := encodeCmd.String("i", "", "input image")
+	outputImage := encodeCmd.String("o", "", "output image")
+	dataFile := encodeCmd.String("d", "", "data file")
+	dataText := encodeCmd.String("t", "", "text to encode")
 
-	if os.Args[1] == "encode" {
-		encode(os.Args[2], os.Args[3], os.Args[4])
-	} else if os.Args[1] == "decode" {
-		decode(os.Args[2])
-	} else if os.Args[1] == "-h" {
+	decodeCmd := flag.NewFlagSet("decode", flag.ExitOnError)
+	encodedImage := decodeCmd.String("i", "", "input image")
+	outputFile := decodeCmd.String("o", "", "output text file")
+
+	help := flag.Bool("h", false, "help")
+	flag.Parse()
+
+	if *help {
 		fmt.Println("Usage:")
-		fmt.Println("  steggo encode input.png datafile encoded.png")
-		fmt.Println("  steggo decode encoded.png")
-		fmt.Println("  steggo decode encoded.png > output.txt")
+		fmt.Println("  steggo encode -i input.png -o encoded.png -d datafile ")
+		fmt.Println("  steggo encode -i input.png -o encoded.png -t \"some text\"")
+		fmt.Println("  steggo decode -i encoded.png")
+		fmt.Println("  steggo decode -i encoded.png > output.txt")
+		os.Exit(0)
+	}
+
+	if len(os.Args) < 2 {
+		fmt.Println("Expected 'enable' or 'decode' subcommands")
+		os.Exit(1)
+	}
+
+	switch os.Args[1] {
+
+	case "encode":
+		encodeCmd.Parse(os.Args[2:])
+		if *dataText != "" {
+			encodeText(*inputImage, *outputImage, []byte(*dataText))
+		} else if *dataFile != "" {
+			encodeFile(*inputImage, *outputImage, *dataFile)
+		} else {
+			fmt.Println("encode requires '-d data file' or '-t text'")
+			os.Exit(1)
+		}
+
+	case "decode":
+		decodeCmd.Parse(os.Args[2:])
+		decode(*encodedImage, *outputFile)
+
+	default:
+		fmt.Println("Expected 'enable' or 'decode' subcommands")
+		os.Exit(1)
 	}
 
 }
 
-func decode(image string) {
+func decode(image, outputFile string) {
 	surface, status := cairo.NewSurfaceFromPNG(image)
 	if status != cairo.StatusSuccess {
 		log.Fatal("Unable to load image: ", status)
 	}
 
 	data := surface.GetData()
+
 	message := parseData(data)
-	// ioutil.WriteFile(outputData, []byte(message), 0777)
-	fmt.Println(message)
+	if outputFile != "" {
+		ioutil.WriteFile(outputFile, []byte(message), 0777)
+	} else {
+		fmt.Println(message)
+	}
 }
 
 func parseData(data []byte) string {
-	message := make([]byte, 1000)
+	var message []byte
 	var char byte = 0
 
 	j := 0
@@ -81,17 +123,21 @@ func parseChar(c string) (string, bool) {
 	return string(char), c[8] == '1'
 }
 
-func encode(inputImage, inputData, outputImage string) {
+func encodeFile(inputImage, outputImage, inputFile string) {
+	message, err := ioutil.ReadFile(inputFile)
+	if err != nil {
+		log.Fatal("couldn't read data file")
+	}
+	encodeText(inputImage, outputImage, message)
+}
+
+func encodeText(inputImage, outputImage string, message []byte) {
+
 	surface, status := cairo.NewSurfaceFromPNG(inputImage)
 	if status != cairo.StatusSuccess {
 		log.Fatal("Unable to load image: ", status)
 	}
-
 	data := surface.GetData()
-	message, err := ioutil.ReadFile(inputData)
-	if err != nil {
-		log.Fatal("couldn't read file")
-	}
 
 	index := 0
 	for _, c := range message {
@@ -125,6 +171,7 @@ func encode(inputImage, inputData, outputImage string) {
 	// now we are done, so set the signal bit odd
 	// index has been incremented, so we need to go back one to overwrite the even byte.
 	setOdd(data, index-1)
+
 	surface.SetData(data)
 	surface.WriteToPNG(outputImage)
 }
